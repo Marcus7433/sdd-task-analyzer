@@ -32,7 +32,7 @@ def analyzer() -> ModuleType:
 
 def make_task(
     task_type: type[Any],
-    task_id: str | None,
+    task_id: Any,
     title: str,
     priority: str,
     status: str,
@@ -310,7 +310,7 @@ def test_missing_creation_or_deadline_raises_value_error_and_logs(
 
 @pytest.mark.parametrize(
     ("priority", "status"),
-    [("Urgente", "Concluída"), ("Alta", "Em andamento")],
+    [("Urgente", "Concluída"), ("Alta", "Em andamento"), ("Alta", "Concluida")],
 )
 def test_invalid_priority_or_status_raises_value_error(
     analyzer: ModuleType, priority: str, status: str
@@ -346,3 +346,29 @@ def test_null_task_id_raises_value_error(analyzer: ModuleType) -> None:
 
     with pytest.raises(ValueError):
         analyzer.analisar_tarefas([task])
+
+def test_non_string_task_id_raises_value_error(analyzer: ModuleType) -> None:
+    """Catch identifiers that violate the SDD's string field type."""
+    task = make_task(
+        analyzer.Task,
+        70,
+        "Identificador numérico",
+        "Baixa",
+        "Pendente",
+        None,
+        None,
+        None,
+    )
+
+    with pytest.raises(ValueError):
+        analyzer.analisar_tarefas([task])
+
+
+def test_duplicate_task_ids_raise_value_error(analyzer: ModuleType) -> None:
+    """Catch duplicate values where the Task contract requires unique identifiers."""
+    task_type = analyzer.Task
+    first_task = make_task(task_type, "80", "Primeira", "Baixa", "Pendente", None, None, None)
+    second_task = make_task(task_type, "80", "Segunda", "Alta", "Pendente", None, None, None)
+
+    with pytest.raises(ValueError):
+        analyzer.analisar_tarefas([first_task, second_task])
