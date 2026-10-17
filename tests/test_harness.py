@@ -36,9 +36,9 @@ def make_task(
     title: str,
     priority: str,
     status: str,
-    created: datetime | None,
-    deadline: datetime | None,
-    completed: datetime | None,
+    created: Any,
+    deadline: Any,
+    completed: Any,
 ) -> Any:
     """Build a Task using the module's declared input model."""
     return task_type(
@@ -372,3 +372,38 @@ def test_duplicate_task_ids_raise_value_error(analyzer: ModuleType) -> None:
 
     with pytest.raises(ValueError):
         analyzer.analisar_tarefas([first_task, second_task])
+
+def test_pending_task_with_completion_date_is_invalid(analyzer: ModuleType) -> None:
+    """Catch a pending Task that violates the required empty completion field."""
+    task = make_task(
+        analyzer.Task,
+        "90",
+        "Pending completion",
+        "Baixa",
+        "Pendente",
+        None,
+        None,
+        datetime(2024, 1, 2, 8),
+    )
+
+    with pytest.raises(ValueError):
+        analyzer.analisar_tarefas([task])
+
+
+def test_completed_task_with_non_datetime_creation_raises_value_error(
+    analyzer: ModuleType,
+) -> None:
+    """Catch a date field that has the wrong runtime type."""
+    task = make_task(
+        analyzer.Task,
+        "91",
+        "Invalid date type",
+        "Baixa",
+        "Concluída",
+        "2024-01-01T08:00:00",
+        datetime(2024, 1, 2, 8),
+        datetime(2024, 1, 2, 7),
+    )
+
+    with pytest.raises(ValueError):
+        analyzer.analisar_tarefas([task])
