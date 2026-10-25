@@ -1,0 +1,9 @@
+services:
+  test-runner:
+    build:
+      context: .
+    volumes:
+      - .:/app:ro
+    environment:
+      PYTHONDONTWRITEBYTECODE: "1"
+      PYTEST_ADDOPTS: "-p no:cacheprovider"
