@@ -1,0 +1,24 @@
+project: sdd-task-analyzer
+python: ">=3.11"
+
+dependencies:
+  runtime: []
+  test:
+    - pytest
+
+public_contract:
+  module: src/task_analyzer.py
+  function: "analisar_tarefas(tarefas: list[Task]) -> dict"
+  custom_exception: DataInconsistenteError
+  output_keys:
+    - total_tarefas_concluidas
+    - tempo_medio_conclusao_geral
+    - taxa_atraso_geral
+    - indicadores_por_prioridade
+
+validation:
+  command: "pytest tests/test_harness.py -v"
+  test_file: tests/test_harness.py
+  container:
+    base_image: python:3.11-slim
+    working_directory: /app
