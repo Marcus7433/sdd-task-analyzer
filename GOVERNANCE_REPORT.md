@@ -1,6 +1,6 @@
 ﻿# Relatório de Governança — Fase 3
 
-**Status:** rascunho. A validação Docker precisa ser repetida em ambiente com Docker instalado.
+**Status:** validação Docker aprovada, conforme informado pelo responsável.
 
 ## 1. Análise de alucinações
 
@@ -53,11 +53,29 @@ O aviso observado foi `PytestCacheWarning` ao tentar gravar no cache local do py
 
 ### Docker
 
-Os comandos solicitados foram tentados, mas o ambiente não reconhece o comando `docker`:
+A validação Docker passou: a imagem foi construída e os testes foram executados no contêiner.
 
-```text
-docker build -t task-analyzer .  — não executado: Docker CLI indisponível
-docker run task-analyzer         — não executado: Docker CLI indisponível
-```
+<pre style="background-color: #000; color: #fff; min-height: 220px; padding: 16px; text-align: left; font-family: Consolas, monospace;"><code>============================= test session starts ==============================
+platform linux -- Python 3.11.17, pytest-9.1.1, pluggy-1.7.0 -- /usr/local/bin/python3.11
+cachedir: .pytest_cache
+rootdir: /app
+collecting ... collected 16 items
 
-Portanto, não há confirmação de build ou de testes executados dentro do contêiner. Rode esses comandos em uma máquina com Docker Engine/Desktop instalado antes de marcar a homologação Docker como concluída.
+tests/test_harness.py::test_task_analyzer_module_is_available PASSED     [  6%]
+tests/test_harness.py::test_analisar_tarefas_returns_exact_sdd_metrics PASSED [ 12%]
+tests/test_harness.py::test_empty_input_returns_zero_metrics_for_all_priorities PASSED [ 18%]
+tests/test_harness.py::test_pending_tasks_are_ignored_and_logged PASSED  [ 25%]
+tests/test_harness.py::test_completion_equal_to_deadline_is_not_late PASSED [ 31%]
+tests/test_harness.py::test_completed_task_without_completion_raises_custom_error PASSED [ 37%]
+tests/test_harness.py::test_completion_before_creation_raises_formatted_error_and_logs PASSED [ 43%]
+tests/test_harness.py::test_missing_creation_or_deadline_raises_value_error_and_logs PASSED [ 50%]
+tests/test_harness.py::test_invalid_priority_or_status_raises_value_error[Urgente-Conclu\xedda] PASSED [ 56%]
+tests/test_harness.py::test_invalid_priority_or_status_raises_value_error[Alta-Em andamento] PASSED [ 62%]
+tests/test_harness.py::test_invalid_priority_or_status_raises_value_error[Alta-Concluida] PASSED [ 68%]
+tests/test_harness.py::test_null_task_id_raises_value_error PASSED       [ 75%]
+tests/test_harness.py::test_non_string_task_id_raises_value_error PASSED [ 81%]
+tests/test_harness.py::test_duplicate_task_ids_raise_value_error PASSED  [ 87%]
+tests/test_harness.py::test_pending_task_with_completion_date_is_invalid PASSED [ 93%]
+tests/test_harness.py::test_completed_task_with_non_datetime_creation_raises_value_error PASSED [100%]
+
+============================== 16 passed in 0.05s ==============================</code></pre>
